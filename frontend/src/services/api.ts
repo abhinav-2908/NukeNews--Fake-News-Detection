@@ -1,0 +1,10 @@
+import type {Analysis} from '../types';
+import axios from 'axios';
+const api=axios.create({baseURL:import.meta.env.VITE_API_BASE_URL||'http://localhost:8000/api',timeout:60000});
+export const analyzeText=(title:string,text:string,input_type:'text'|'pdf'|'image'='text',extraction:Record<string,any>={})=>api.post<Analysis>('/analyze/text',{title,text,input_type,extraction}).then(r=>r.data);
+export const analyzeUrl=(url:string)=>api.post<Analysis>('/analyze/url',{url}).then(r=>r.data);
+export const extractFile=(kind:'pdf'|'image',file:File)=>{const form=new FormData();form.append('file',file);return api.post<{text:string;extraction:Record<string,any>}>(`/extract/${kind}`,form).then(r=>r.data)};
+export const getHistory=()=>api.get<Analysis[]>('/history').then(r=>r.data);
+export const deleteHistory=(id:string)=>api.delete(`/history/${id}`);
+export const clearHistory=()=>api.delete('/history');
+export const getMetrics=()=>api.get('/metrics').then(r=>r.data);
